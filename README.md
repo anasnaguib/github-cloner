@@ -1,6 +1,6 @@
 # GitHub Repo Cloner
 
-This project provides a PowerShell script to clone all repositories from a GitHub user or organization.
+This project provides scripts to clone all repositories from a GitHub user or organization.
 
 ## Features
 
@@ -11,20 +11,22 @@ This project provides a PowerShell script to clone all repositories from a GitHu
 - Uses SSH or HTTPS clone URLs
 - Automatic pagination of API results
 - Skips existing local folders
+- **Supports both PowerShell (Windows) and Bash (Linux/Mac)**
 
 ## Requirements
 
-- PowerShell 5.1 or later
-- Git installed and available in PATH
+- **Windows:** PowerShell 5.1 or later
+- **Linux/Mac:** Bash, curl, jq, and Git installed and available in PATH
 - (Optional) GitHub personal access token for private repositories
 
 ## Usage
 
-See [usage.md](usage.md) for detailed instructions and examples.
+See [usage.md](usage.md) for detailed instructions and examples for both PowerShell and Bash scripts.
 
-## Script
+## Scripts
 
-- [clone-github-repos.ps1](clone-github-repos.ps1): Main PowerShell script
+- [clone-github-repos.ps1](clone-github-repos.ps1): PowerShell script for Windows
+- [clone-github-repos.sh](clone-github-repos.sh): Bash script for Linux/Mac
 
 ## License
 

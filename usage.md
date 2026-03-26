@@ -1,14 +1,18 @@
 # GitHub Repo Cloner Usage
 
-This guide explains how to use the PowerShell script at `scripts/clone-github-repos.ps1`.
+This guide explains how to use the scripts to clone all repositories from a GitHub user or organization.
 
 ## Requirements
 
-- PowerShell 5.1+
-- Git installed and available in PATH
+- **Windows:** PowerShell 5.1+, Git
+- **Linux/Mac:** Bash, curl, jq, Git
 - Optional: GitHub personal access token in `GITHUB_TOKEN` for private repositories
 
-## Basic Commands
+---
+
+## PowerShell (Windows)
+
+### Basic Commands
 
 Clone all repositories for a user:
 
@@ -22,7 +26,7 @@ Clone all repositories for an organization:
 .\scripts\clone-github-repos.ps1 -Org your-org -Destination .
 ```
 
-## Avoid GitHub Blocking
+### Avoid GitHub Blocking
 
 Enable polite mode to reduce the chance of API abuse/rate-limit blocking.
 This mode adds randomized delays and retries API calls with backoff.
@@ -36,6 +40,41 @@ Tune pacing and retries:
 ```powershell
 .\scripts\clone-github-repos.ps1 -Org your-org -Destination . -AvoidBlocking -MinDelaySeconds 2 -MaxDelaySeconds 5 -MaxApiRetries 8
 ```
+
+---
+
+## Bash (Linux/Mac)
+
+### Basic Commands
+
+Clone all repositories for a user:
+
+```bash
+./scripts/clone-github-repos.sh --user your-username --destination .
+```
+
+Clone all repositories for an organization:
+
+```bash
+./scripts/clone-github-repos.sh --org your-org --destination .
+```
+
+### Avoid GitHub Blocking
+
+Enable polite mode to reduce the chance of API abuse/rate-limit blocking.
+This mode adds randomized delays and retries API calls with backoff.
+
+```bash
+./scripts/clone-github-repos.sh --user your-username --destination . --avoid-blocking
+```
+
+Tune pacing and retries:
+
+```bash
+./scripts/clone-github-repos.sh --org your-org --destination . --avoid-blocking --min-delay 2 --max-delay 5 --max-api-retries 8
+```
+
+---
 
 ## Authentication (for private repos)
 
