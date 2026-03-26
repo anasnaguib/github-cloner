@@ -274,6 +274,7 @@ $skipped = 0
 $failed = 0
 
 foreach ($repo in $repos) {
+
     $repoUrl = if ($UseSsh) { $repo.ssh_url } else { $repo.clone_url }
     $repoDir = Join-Path -Path $destinationPath -ChildPath $repo.name
 
@@ -291,6 +292,24 @@ foreach ($repo in $repos) {
         if ($LASTEXITCODE -ne 0) {
             throw "git clone exited with code $LASTEXITCODE"
         }
+
+        # Fetch all tags and all remotes
+        Write-Info "Fetching all tags and branches for $($repo.full_name)"
+        Push-Location $repoDir
+        git fetch --all --tags | Out-Null
+
+        # Get all remote branches
+        $remoteBranches = git branch -r | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^origin/' -and $_ -notmatch '/HEAD$' }
+        $localBranches = git branch --list | ForEach-Object { $_.Trim().Replace('* ', '') }
+
+        foreach ($remoteBranch in $remoteBranches) {
+            $branchName = $remoteBranch -replace '^origin/', ''
+            if ($localBranches -notcontains $branchName) {
+                Write-Info "Checking out branch '$branchName' for $($repo.full_name)"
+                git branch $branchName $remoteBranch | Out-Null
+            }
+        }
+        Pop-Location
 
         $cloned++
     } catch {
