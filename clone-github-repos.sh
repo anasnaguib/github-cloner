@@ -169,7 +169,20 @@ for row in $(echo "$repos_json" | jq -r '.[] | @base64'); do
   fi
   repo_dir="$DEST/$name"
   if [[ -d "$repo_dir" ]]; then
-    echo "[WARN] Skipping $full_name (directory exists: $repo_dir)"
+    echo "[INFO] Updating $full_name (directory exists: $repo_dir)"
+    (
+      cd "$repo_dir"
+      polite_delay "git fetch"
+      git fetch --all --tags
+      git pull --all
+      remote_branches=$(git branch -r | grep '^  origin/' | grep -v '/HEAD$' | sed 's/^  origin\///')
+      for branch in $remote_branches; do
+        if ! git branch --list | grep -q "^  $branch$"; then
+          echo "[INFO] Checking out branch '$branch' for $full_name"
+          git branch "$branch" "origin/$branch"
+        fi
+      done
+    )
     skipped=$((skipped+1))
     continue
   fi

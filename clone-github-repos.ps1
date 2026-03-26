@@ -279,8 +279,28 @@ foreach ($repo in $repos) {
     $repoDir = Join-Path -Path $destinationPath -ChildPath $repo.name
 
     if (Test-Path -Path $repoDir) {
-        Write-Warn "Skipping $($repo.full_name) (directory exists: $repoDir)"
-        $skipped++
+        Write-Info "Updating $($repo.full_name) (directory exists: $repoDir)"
+        try {
+            Push-Location $repoDir
+            Wait-PoliteDelay -Reason "git fetch"
+            git fetch --all --tags | Out-Null
+            git pull --all | Out-Null
+            # Get all remote branches
+            $remoteBranches = git branch -r | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^origin/' -and $_ -notmatch '/HEAD$' }
+            $localBranches = git branch --list | ForEach-Object { $_.Trim().Replace('* ', '') }
+            foreach ($remoteBranch in $remoteBranches) {
+                $branchName = $remoteBranch -replace '^origin/', ''
+                if ($localBranches -notcontains $branchName) {
+                    Write-Info "Checking out branch '$branchName' for $($repo.full_name)"
+                    git branch $branchName $remoteBranch | Out-Null
+                }
+            }
+            Pop-Location
+            $skipped++
+        } catch {
+            Write-Warn "Failed to update $($repo.full_name): $_"
+            $failed++
+        }
         continue
     }
 
